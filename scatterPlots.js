@@ -1,3 +1,5 @@
+//finds the mean grades for each scenario
+
 var getMeanGrade = function(entries)
 {
     return d3.mean(entries,function(entry)
@@ -6,18 +8,29 @@ var getMeanGrade = function(entries)
         })
 }
 
-
-var drawScatter = function(students,target,
-              xScale,yScale,xProp,yProp)
+//through xprop and yprop, it lets the axes remain variable and changable by
+//a click of a button.
+var drawScatter = function(students,target,xScale,yScale,xProp,yProp,graph)
 {
-
+    
     setBanner(xProp.toUpperCase() +" vs "+ yProp.toUpperCase());
     
+    var circles = 
     d3.select(target).select(".graph")
     .selectAll("circle")
     .data(students)
-    .enter()
+    
+    
+    circles.enter()
     .append("circle")
+    
+    circles.exit()
+           .remove()
+    
+    d3.select(target).select(".graph")
+        .selectAll("circle")
+    .transition()
+    .duration(1500)
     .attr("cx",function(student)
     {
         return xScale(getMeanGrade(student[xProp]));    
@@ -27,7 +40,8 @@ var drawScatter = function(students,target,
         return yScale(getMeanGrade(student[yProp]));    
     })
     .attr("r",4);
-}
+} 
+        
 
 var clearScatter = function(target)
 {
@@ -37,7 +51,7 @@ var clearScatter = function(target)
         .remove();
 }
 
-
+// creates axes by defining the spots bewteen margins and graph dimensions
 var createAxes = function(screen,margins,graph,
                            target,xScale,yScale)
 {
@@ -56,7 +70,7 @@ var createAxes = function(screen,margins,graph,
         .call(yAxis)
 }
 
-
+//initiates the graph by calling the defined funtions 
 var initGraph = function(target,students)
 {
     //the size of the screen
@@ -108,13 +122,14 @@ var initGraph = function(target,students)
 
 }
 
+//links the buttons to the functions that give it the correct data
 var initButtons = function(students,target,xScale,yScale)
 {
     
     d3.select("#fvh")
     .on("click",function()
     {
-        clearScatter(target);
+        //clearScatter(target);
         drawScatter(students,target,
               xScale,yScale,"final","homework");
     })
@@ -122,7 +137,7 @@ var initButtons = function(students,target,xScale,yScale)
     d3.select("#hvq")
     .on("click",function()
     {
-        clearScatter(target);
+        //clearScatter(target);
         drawScatter(students,target,
               xScale,yScale,"homework","test");
     })
@@ -130,7 +145,7 @@ var initButtons = function(students,target,xScale,yScale)
     d3.select("#tvf")
     .on("click",function()
     {
-        clearScatter(target);
+       // clearScatter(target);
         drawScatter(students,target,
               xScale,yScale,"test","final");
     })
@@ -138,7 +153,7 @@ var initButtons = function(students,target,xScale,yScale)
     d3.select("#tvq")
     .on("click",function()
     {
-        clearScatter(target);
+        //clearScatter(target);
         drawScatter(students,target,
               xScale,yScale,"test","quizes");
     })
@@ -147,6 +162,7 @@ var initButtons = function(students,target,xScale,yScale)
     
 }
 
+//edits the banner to desplay what data is being compared
 var setBanner = function(msg)
 {
     d3.select("#banner")
@@ -155,7 +171,7 @@ var setBanner = function(msg)
 }
 
 
-
+//links the data to the functions
 var penguinPromise = d3.json("classData.json");
 
 penguinPromise.then(function(penguins)
@@ -168,3 +184,6 @@ function(err)
 {
    console.log("Error Loading data:",err);
 });
+
+
+
